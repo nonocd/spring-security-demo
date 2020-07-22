@@ -1,0 +1,48 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+group = 'com.stvd.springframework.security'
+description = 'Spring Security'
+version = '0.0.1-SNAPSHOT'
+
+allprojects {
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/public/'
+        }
+        maven {
+            url 'https://maven.aliyun.com/repository/spring/'
+        }
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+subprojects {
+    plugins.withType(JavaPlugin) {
+        project.sourceCompatibility='1.8'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+}
+
+ext {
+    springBootVersion = "2.3.1.RELEASE"
+}
+
+dependencies {
+    implementation 'com.alibaba:fastjson:1.2.72'
+    implementation 'mysql:mysql-connector-java:5.1.48'
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//	implementation 'org.springframework.security:spring-security-oauth2-core:5.3.3.RELEASE'
+//	implementation 'org.springframework.security:spring-security-oauth2-client:5.3.3.RELEASE'
+//	implementation 'org.springframework.security:spring-security-oauth2-resource-server:5.3.3.RELEASE'
+//	implementation "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:${springBootVersion}"
+}
