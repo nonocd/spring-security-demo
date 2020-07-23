@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8082
 
 logging:
   level:
@@ -13,21 +13,34 @@ spring:
     oauth2:
       client:
         registration:
-          auth-server:
+          messaging-client-auth-code:
             provider: demo
-            client-id: 000000
-            client-secret: 999999
-            scope: read, write
-            client-authentication-method: basic
+            client-id: '000000'
+            client-secret: '999999'
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/authorized"
+            scope: read,write
+          messaging-client-client-creds:
+            provider: demo
+            client-id: '000000'
+            client-secret: '999999'
+            authorization-grant-type: client_credentials
+            scope: read,write
+          messaging-client-password:
+            provider: demo
+            client-id: '000000'
+            client-secret: '999999'
             authorization-grant-type: password
-        #            authorization-grant-type: authorization_code
-        #            scope: message.read,message.write
-        #            authorization-grant-type: client_credentials
-        #            scope: message.read,message.write
+            scope: read,write
         provider:
           demo:
             authorization-uri: http://localhost:9001/oauth/authorize
             token-uri: http://localhost:9001/oauth/token
             user-info-uri: http://localhost:9001/oauth/v1/userinfo
+            user-info-authentication-method: header
+            user-name-attribute: username
 
 resource-uri: http://localhost:9001/auth/user/info
+
+messages:
+  base-uri: http://localhost:8081/messages
