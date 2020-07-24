@@ -1,36 +1,25 @@
-package com.stvd.oauth2.app.service;
+package com.stvd.oauth2.client.security;
 
-import com.stvd.oauth2.app.model.SysPermission;
-import com.stvd.oauth2.app.model.SysUser;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import java.util.ArrayList;
-import java.util.List;
+public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
-//@Service
-public class UserDetailsServiceImpl implements UserDetailsService {
-    @Autowired
-    private SysUserService userService;
+    private UserDetails userDetails = User.withUsername("admin")
+            .username("admin")
+            .password("$2a$10$y8YrNP/wR2hY1DK499M94.JlJnYf/b81.ASw7kZiCxHeLRO1FyFEu")
+            .roles("USER")
+            .build();
 
-    @Autowired
-    private SysPermissionService permissionService;
-    /**
-     * 查询数据库用户信息
-     *
-     * @param username
-     * @return
-     * @throws UsernameNotFoundException
-     */
+    private InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager(userDetails);
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        /*
         SysUser sysUser = userService.getUserByName(username);
         if (null == sysUser) {
             throw new UsernameNotFoundException("username: " + username + " is not exist!");
@@ -45,5 +34,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         });
         // 返回认证用户
         return new User(sysUser.getUsername(), sysUser.getPassword(), authorities);
+        */
+
+        return manager.loadUserByUsername(username);
     }
 }

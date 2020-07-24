@@ -79,7 +79,7 @@ public class CustomOAuth2PasswordGrantRequestEntityConverter implements Converte
 
     private static HttpHeaders getDefaultTokenRequestHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON_UTF8));
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         final MediaType contentType = MediaType.valueOf(APPLICATION_FORM_URLENCODED_VALUE + ";charset=UTF-8");
         headers.setContentType(contentType);
         return headers;

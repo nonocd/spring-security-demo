@@ -18,7 +18,6 @@ package com.stvd.oauth2.client.config;
 
 import com.stvd.oauth2.client.security.CustomOAuth2PasswordGrantRequestEntityConverter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.*;
@@ -29,7 +28,6 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,15 +43,8 @@ import java.util.function.Function;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${resource-uri}")
-    String resourceUri;
-
-    @Bean
-    RestTemplate restTemplate() {
-        RestTemplate restOptions = new RestTemplate();
-
-        return restOptions;
-    }
+    @Value("${resource.base-uri}")
+    String resourceBaseUri;
 
     @Bean
     WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
@@ -61,11 +52,10 @@ public class WebClientConfig {
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
 
         return WebClient.builder()
-                .baseUrl(resourceUri)
+                .baseUrl(resourceBaseUri)
                 .apply(oauth2.oauth2Configuration())
                 .build();
     }
-
 
     @Bean
     OAuth2AuthorizedClientManager authorizedClientManager(ClientRegistrationRepository clientRegistrationRepository,
@@ -75,8 +65,8 @@ public class WebClientConfig {
                         .authorizationCode()
                         .refreshToken()
                         .clientCredentials()
-                        .password(passworgGrant ->
-                                passworgGrant.accessTokenResponseClient(passwordTokenResponseClient())
+                        .password(passwordGrantBuilder ->
+                                passwordGrantBuilder.accessTokenResponseClient(passwordTokenResponseClient())
                         )
                         .build();
         DefaultOAuth2AuthorizedClientManager authorizedClientManager =

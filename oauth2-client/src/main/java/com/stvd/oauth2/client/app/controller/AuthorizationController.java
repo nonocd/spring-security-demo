@@ -13,8 +13,7 @@ import static org.springframework.security.oauth2.client.web.reactive.function.c
 @Controller
 public class AuthorizationController {
 
-    @Value("${messages.base-uri}")
-    private String messagesBaseUri;
+    private String messagesBaseUri = "/hello";
 
     @Autowired
     private WebClient webClient;
@@ -48,12 +47,14 @@ public class AuthorizationController {
     }
 
     private String[] retrieveMessages(String clientRegistrationId) {
-        return this.webClient
+        String msg = this.webClient
                 .get()
                 .uri(this.messagesBaseUri)
                 .attributes(clientRegistrationId(clientRegistrationId))
                 .retrieve()
-                .bodyToMono(String[].class)
-                .block();
+                .toEntity(String.class)
+                .block()
+                .getBody();
+        return new String[]{msg};
     }
 }

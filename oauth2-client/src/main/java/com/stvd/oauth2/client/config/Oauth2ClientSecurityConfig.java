@@ -1,24 +1,24 @@
 package com.stvd.oauth2.client.config;
 
-import com.stvd.oauth2.client.security.UserAuthenticationProvider;
+import com.stvd.oauth2.client.security.CustomOauth2AuthenticationProvider;
+import com.stvd.oauth2.client.security.CustomOauth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
 public class Oauth2ClientSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final String clientRegistrationId = "client-password";
 
     @Override
     public void configure(WebSecurity web) {
@@ -35,8 +35,8 @@ public class Oauth2ClientSecurityConfig extends WebSecurityConfigurerAdapter {
                         .mvcMatchers("/", "/public/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin()
-//                .loginPage("/login")
-//                .failureUrl("/login?error=")
+                .loginPage("/login")
+                .failureUrl("/login?error=")
                 .permitAll()
                 .and()
                 .oauth2Client();
@@ -44,38 +44,24 @@ public class Oauth2ClientSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(customAuthenticationProvider());
+        auth.authenticationProvider(authenticationProvider());
     }
 
     @Bean
-    DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
-        provider.setPasswordEncoder(passwordEncoder());
+    AuthenticationProvider authenticationProvider() {
+        CustomOauth2AuthenticationProvider provider = new CustomOauth2AuthenticationProvider(this.clientRegistrationId);
         return provider;
     }
 
     @Bean
-    UserAuthenticationProvider customAuthenticationProvider() {
-        UserAuthenticationProvider provider = new UserAuthenticationProvider();
-        return provider;
+    OAuth2UserService oAuth2UserService() {
+        CustomOauth2UserService userService = new CustomOauth2UserService();
+        return userService;
     }
 
     @Bean
     PasswordEncoder passwordEncoder() {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder;
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.withUsername("admin")
-                .username("admin")
-                .password("$2a$10$y8YrNP/wR2hY1DK499M94.JlJnYf/b81.ASw7kZiCxHeLRO1FyFEu")
-//                .password("{bcrypt}$2a$10$y8YrNP/wR2hY1DK499M94.JlJnYf/b81.ASw7kZiCxHeLRO1FyFEu")
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(userDetails);
     }
 }
